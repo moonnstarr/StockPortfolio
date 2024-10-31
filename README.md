@@ -137,7 +137,7 @@ This project is open-source and free to use, modify, and distribute. Please feel
 
 ## Contact us
 
-Please reach out to us if you have any questions or need to build something similar to this us at info@avionanalytics.com
+Please reach out to us if you have any questions or need to build something similar to this at info@avionanalytics.com
 
 ---
 
