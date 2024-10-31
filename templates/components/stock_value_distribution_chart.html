@@ -1,0 +1,94 @@
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Stock Value Distribution</h3>
+    </div>
+    <div class="card-body">
+        <canvas id="stockValueChart" style="height: 250px;"></canvas>
+    </div>
+</div>
+
+<!-- Include Chart.js and the Data Labels plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Prepare data for the pie chart
+        const labels = {{ portfolio.stocks | map(attribute='symbol') | list | tojson }};
+        const dataValues = {{ portfolio.stocks | map(attribute='total_value') | list | tojson }};
+
+        // Combine stocks with the same symbol
+        const combinedData = {};
+        for (let i = 0; i < labels.length; i++) {
+            if (combinedData[labels[i]]) {
+                combinedData[labels[i]] += dataValues[i]; // Aggregate values for the same stock
+            } else {
+                combinedData[labels[i]] = dataValues[i]; // Initialize with the first occurrence
+            }
+        }
+
+        // Prepare labels and data arrays for the pie chart
+        const combinedLabels = Object.keys(combinedData);
+        const combinedValues = Object.values(combinedData);
+
+        const pieData = {
+            labels: combinedLabels,
+            datasets: [{
+                label: 'Stock Value Distribution',
+                data: combinedValues,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // Pie Chart configuration
+        const pieConfig = {
+            type: 'pie',
+            data: pieData,
+            options: {
+                responsive: true,
+                plugins: {
+                    // Plugin to display labels
+                    datalabels: {
+                        color: 'black', // Set font color to black or grey
+                        formatter: (value, context) => {
+                            const total = context.chart.data.datasets[0].data.reduce((acc, val) => acc + val, 0);
+                            const percentage = ((value / total) * 100).toFixed(2) + '%';
+                            return percentage; // Show the percentage
+                        },
+                        anchor: 'center',
+                        align: 'center',
+                        font: {
+                            weight: 'bold',
+                            size: 14 // Adjust size as necessary
+                        },
+                        clamp: true, // Prevents overlapping by limiting label positions
+                        overflow: 'hidden', // Ensures labels are confined within the segment
+                    }
+                }
+            },
+            plugins: [ChartDataLabels] // Registering the plugin
+        };
+
+        // Render the pie chart
+        const stockValueChart = new Chart(
+            document.getElementById('stockValueChart'),
+            pieConfig
+        );
+    });
+</script>

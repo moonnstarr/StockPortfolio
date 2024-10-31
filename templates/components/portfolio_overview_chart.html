@@ -1,0 +1,76 @@
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Portfolio Overview</h3>
+    </div>
+    <div class="card-body">
+        <h5>Total Portfolio Value: ${{ '{:,.2f}'.format(portfolio.total_value) }}</h5>
+        <h5 class="{{ 'text-success' if portfolio.total_gain_loss >= 0 else 'text-danger' }}">
+            Total Gain/Loss: ${{ '{:,.2f}'.format(portfolio.total_gain_loss) }}
+        </h5>
+        <canvas id="portfolioChart" style="height: 250px;"></canvas>
+    </div>
+</div>
+
+<!-- Include Chart.js and the Data Labels plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Prepare data for the portfolio overview chart
+        const portfolioData = {
+            labels: ['Total Value', 'Total Gain/Loss'],
+            datasets: [{
+                label: 'Portfolio Overview',
+                data: [{{ portfolio.total_value }}, {{ portfolio.total_gain_loss }}],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(255, 206, 86, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // Chart configuration
+        const portfolioConfig = {
+            type: 'bar',
+            data: portfolioData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    // Plugin to display labels
+                    datalabels: {
+                        color: 'black', // Set font color to black or grey
+                        formatter: (value, context) => {
+                            const total = context.chart.data.datasets[0].data.reduce((acc, val) => acc + val, 0);
+                            const percentage = ((value / total) * 100).toFixed(2) + '%';
+                            return percentage; // Show the percentage
+                        },
+                        anchor: 'center', // Positioning of the labels
+                        align: 'center',
+                        font: {
+                            weight: 'bold',
+                            size: 14 // Adjust size as necessary
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels] // Registering the plugin
+        };
+
+        // Render the portfolio chart
+        const portfolioChart = new Chart(
+            document.getElementById('portfolioChart'),
+            portfolioConfig
+        );
+    });
+</script>

@@ -1,0 +1,17 @@
+/* datatables.css */
+@import url('https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css');
+
+/* Additional styling if needed */
+table.dataTable thead th,
+table.dataTable tfoot th {
+    background-color: #f7f7f7;
+    color: #333;
+}
+
+table.dataTable tbody tr {
+    transition: background-color 0.3s;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: #f1f1f1;
+}
